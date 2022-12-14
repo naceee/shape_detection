@@ -135,11 +135,10 @@ def main():
         "line": {"direction": (1, 1, 0.2), "length": 1}
     }
     # create_point_clouds(shape_dicts, 500, 0.01)
-    create_rotated_point_clouds(shape_dicts, 500, 0.01, 100)
-
+    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 10)
 
     for shape in ["torus", "sphere", "cube", "line"]:
-        points = np.loadtxt(f'rotated_point_clouds/{shape}_1.csv', delimiter=',')
+        points = np.loadtxt(f'rotated_point_clouds/{shape}_0.csv', delimiter=',')
         plot_point_cloud(points)
 
 
