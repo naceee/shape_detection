@@ -77,6 +77,20 @@ def point_cloud(shape, n, sigma, params=None):
             z = r * math.sin(theta) + random.gauss(0, sigma)
             points[i, :] = [x, y, z]
 
+    elif shape == "cylinder":
+        r = params["r"]
+        h = params["height"]
+        for i in range(n):
+            phi = random.uniform(0, 2 * math.pi)
+
+            x = r * math.cos(phi) + random.gauss(0, sigma)
+            y = r * math.sin(phi) + random.gauss(0, sigma)
+            z = random.uniform(0, h) + random.gauss(0, sigma)
+            points[i, :] = [x, y, z]
+
+    else:
+        raise Exception("invalid shape")
+
     return points
 
 
@@ -127,19 +141,28 @@ def create_rotated_point_clouds(shape_dicts, n, sigma, k):
             np.savetxt(f'rotated_point_clouds/{shape}_{i}.csv', points, delimiter=',')
 
 
+def plot_shapes(shape, rotated=True, indices=None):
+    if rotated:
+        for idx in indices:
+            points = np.loadtxt(f'rotated_point_clouds/{shape}_{idx}.csv', delimiter=',')
+            plot_point_cloud(points)
+    else:
+        points = np.loadtxt(f'point_clouds/{shape}.csv', delimiter=',')
+        plot_point_cloud(points)
+
+
 def main():
     shape_dicts = {
         "sphere": {"r": 1},
         "torus": {"r": 0.2, "R": 1},
         "cube": {"edge_len": 1},
-        "line": {"direction": (1, 1, 0.2), "length": 1}
+        "line": {"direction": (1, 1, 0.2), "length": 1},
+        "cylinder": {"r": 1, "height": 2}
     }
     # create_point_clouds(shape_dicts, 500, 0.01)
     # create_rotated_point_clouds(shape_dicts, 500, 0.01, 10)
 
-    for shape in ["torus", "sphere", "cube", "line"]:
-        points = np.loadtxt(f'rotated_point_clouds/{shape}_0.csv', delimiter=',')
-        plot_point_cloud(points)
+    plot_shapes("cylinder", True, list(range(10)))
 
 
 if __name__ == "__main__":
