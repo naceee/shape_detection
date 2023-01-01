@@ -2,6 +2,8 @@
 #### project for topological data analysis
 
 ## current point clouds:
+All the point clouds are in the folder `point_clouds` and are already rotated (random in all directions) and scaled (random between x1 - x10).
+
 ### torus
 ![image](https://user-images.githubusercontent.com/47631585/207685361-f0ede539-8398-482c-b02c-dd8a63ccbe9e.png)
 
