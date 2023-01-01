@@ -16,7 +16,7 @@ def plot_point_cloud(points, title=""):
     fig = plt.figure(num=1, figsize=(6, 6))
     ax = fig.add_subplot(projection='3d')
 
-    # For each set of style and range settings, plot n random points in the box
+    # For each set of style and range settings, plot num_points random points in the box
     xs = [p[0] for p in points]
     ys = [p[1] for p in points]
     zs = [p[2] for p in points]
@@ -184,40 +184,24 @@ def scale_points(points, k):
     return points * k
 
 
-def create_point_clouds(shape_dicts, n, sigma):
-    for shape, shape_dict in shape_dicts.items():
-        points = point_cloud(shape, n, sigma, shape_dict)
-        np.savetxt(f'point_clouds/{shape}.csv', points, delimiter=',')
-
-
 def create_rotated_point_clouds(shape_dicts, n, sigma, k):
     for shape, shape_dict in shape_dicts.items():
-        points = point_cloud(shape, n, sigma, shape_dict)
 
         for i in range(k):
-            points_copy = copy.deepcopy(points)
-            points_copy = rotate_around_axis(points_copy, "x", random.uniform(0, 2 * math.pi))
-            points_copy = rotate_around_axis(points_copy, "y", random.uniform(0, 2 * math.pi))
-            points_copy = rotate_around_axis(points_copy, "z", random.uniform(0, 2 * math.pi))
-            points_copy = scale_points(points_copy, random.uniform(1, 10))
-            np.savetxt(f'rotated_scaled_point_clouds/{shape}_{i}.csv', points_copy, delimiter=',')
+            points = point_cloud(shape, n, sigma, shape_dict)
+            points = rotate_around_axis(points, "x", random.uniform(0, 2 * math.pi))
+            points = rotate_around_axis(points, "y", random.uniform(0, 2 * math.pi))
+            points = rotate_around_axis(points, "z", random.uniform(0, 2 * math.pi))
+            points = scale_points(points, random.uniform(1, 10))
+            np.savetxt(f'point_clouds/{shape}_{i}.csv', points, delimiter=',')
 
 
-def plot_all_shapes(shape=None):
+def plot_shapes(shape=None, n=0):
     for filename in os.listdir("point_clouds"):
-        if shape is None or shape in filename:
-            f = os.path.join("point_clouds", filename)
-            points = np.loadtxt(f, delimiter=',')
-            plot_point_cloud(points, filename)
-
-
-def plot_rotated_shapes(shape=None, n=0):
-    for filename in os.listdir("rotated_scaled_point_clouds"):
         matches = re.findall(f"_([0-9]*).csv", filename)
-        print(matches)
 
         if (len(matches) == 1 and int(matches[0]) <= n) and (shape is None or shape in filename):
-            f = os.path.join("rotated_scaled_point_clouds", filename)
+            f = os.path.join("point_clouds", filename)
             points = np.loadtxt(f, delimiter=',')
             plot_point_cloud(points, filename)
 
@@ -232,11 +216,9 @@ def main():
         "cuboid": {"a": 1, "b": 2, "c": 0.5},
         "ellipsoid": {"a": 1, "b": 2, "c": 0.5}
     }
-    create_point_clouds(shape_dicts, 500, 0.01)
-    create_rotated_point_clouds(shape_dicts, 500, 0.01, 100)
+    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 20)
 
-    # plot_all_shapes()
-    plot_rotated_shapes(shape="cuboid", n=4)
+    plot_shapes()
 
 
 if __name__ == "__main__":
