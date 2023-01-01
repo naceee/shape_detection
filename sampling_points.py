@@ -104,22 +104,27 @@ def point_cloud(shape, n, sigma, params=None):
             points[i, :] = [x, y, z]
 
     elif shape == "cuboid":
-        normals = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
         a = params["a"]
         b = params["b"]
         c = params["c"]
+        area = 2*(a*b + b*c + a*c)
+        probabilities = [2*a*b/area, 2*a*c/area, 2*b*c/area]
 
         for i in range(n):
             # Choose a random normal vector
-            normal = random.choice(normals)
-
-            # Generate a random point on the corresponding face
-            x = random.uniform(0, a) if normal[0] == 0 else (0 if normal[0] == 1 else a) + \
-                random.gauss(0, sigma)
-            y = random.uniform(0, b) if normal[1] == 0 else (0 if normal[1] == 1 else b) + \
-                random.gauss(0, sigma)
-            z = random.uniform(0, c) if normal[2] == 0 else (0 if normal[2] == 1 else c) + \
-                random.gauss(0, sigma)
+            r = random.random()
+            if r < probabilities[0]:
+                x = random.uniform(0, a)
+                y = random.uniform(0, b)
+                z = random.choice([0, c]) + random.gauss(0, sigma)
+            elif r < probabilities[0] + probabilities[1]:
+                x = random.uniform(0, a)
+                y = random.choice([0, b]) + random.gauss(0, sigma)
+                z = random.uniform(0, c)
+            else:
+                x = random.choice([0, a]) + random.gauss(0, sigma)
+                y = random.uniform(0, b)
+                z = random.uniform(0, c)
 
             points[i, :] = [x, y, z]
 
@@ -227,11 +232,11 @@ def main():
         "cuboid": {"a": 1, "b": 2, "c": 0.5},
         "ellipsoid": {"a": 1, "b": 2, "c": 0.5}
     }
-    # create_point_clouds(shape_dicts, 500, 0.01)
-    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 100)
+    create_point_clouds(shape_dicts, 500, 0.01)
+    create_rotated_point_clouds(shape_dicts, 500, 0.01, 100)
 
     # plot_all_shapes()
-    plot_rotated_shapes()
+    plot_rotated_shapes(shape="cuboid", n=4)
 
 
 if __name__ == "__main__":
