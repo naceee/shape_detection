@@ -1,11 +1,15 @@
+import copy
 import math
 import random
+import re
+
 import numpy as np
 import matplotlib.pyplot as plt
 import warnings
+import os
 
 
-def plot_point_cloud(points):
+def plot_point_cloud(points, title=""):
     # sorry this is very ugly
     warnings.filterwarnings("ignore")
 
@@ -22,6 +26,7 @@ def plot_point_cloud(points):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
     ax.set_aspect("equal")
+    plt.title(title)
     plt.show()
 
 
@@ -81,11 +86,58 @@ def point_cloud(shape, n, sigma, params=None):
         r = params["r"]
         h = params["height"]
         for i in range(n):
-            phi = random.uniform(0, 2 * math.pi)
+            surface_percentage_top_bottom = (2 * math.pi * r ** 2) / (2 * math.pi * r * (r + h))
+            if random.random() < surface_percentage_top_bottom:
+                x = random.uniform(-r, r)
+                y = random.uniform(-r, r)
+                while math.sqrt(x**2 + y**2) > r:
+                    x = random.uniform(-r, r)
+                    y = random.uniform(-r, r)
 
-            x = r * math.cos(phi) + random.gauss(0, sigma)
-            y = r * math.sin(phi) + random.gauss(0, sigma)
-            z = random.uniform(0, h) + random.gauss(0, sigma)
+                z = random.choice([0, h]) + random.gauss(0, sigma)
+            else:
+                phi = random.uniform(0, 2 * math.pi)
+
+                x = r * math.cos(phi) + random.gauss(0, sigma)
+                y = r * math.sin(phi) + random.gauss(0, sigma)
+                z = random.uniform(0, h) + random.gauss(0, sigma)
+            points[i, :] = [x, y, z]
+
+    elif shape == "cuboid":
+        normals = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+        a = params["a"]
+        b = params["b"]
+        c = params["c"]
+
+        for i in range(n):
+            # Choose a random normal vector
+            normal = random.choice(normals)
+
+            # Generate a random point on the corresponding face
+            x = random.uniform(0, a) if normal[0] == 0 else (0 if normal[0] == 1 else a) + \
+                random.gauss(0, sigma)
+            y = random.uniform(0, b) if normal[1] == 0 else (0 if normal[1] == 1 else b) + \
+                random.gauss(0, sigma)
+            z = random.uniform(0, c) if normal[2] == 0 else (0 if normal[2] == 1 else c) + \
+                random.gauss(0, sigma)
+
+            points[i, :] = [x, y, z]
+
+    elif shape == "ellipsoid":
+        a = params["a"]
+        b = params["b"]
+        c = params["c"]
+        for i in range(n):
+            # Generate a random point in the bounding box
+            x = random.uniform(-a, a)
+            y = random.uniform(-b, b)
+            z = random.uniform(-c, c)
+
+            # Accept the point if it falls on the surface of the ellipsoid
+            while not math.isclose(x**2 / a**2 + y**2 / b**2 + z**2 / c**2, 1, rel_tol=2*sigma):
+                x = random.uniform(-a, a)
+                y = random.uniform(-b, b)
+                z = random.uniform(-c, c)
             points[i, :] = [x, y, z]
 
     else:
@@ -123,6 +175,10 @@ def translate_points(points, vector):
     return points + vector
 
 
+def scale_points(points, k):
+    return points * k
+
+
 def create_point_clouds(shape_dicts, n, sigma):
     for shape, shape_dict in shape_dicts.items():
         points = point_cloud(shape, n, sigma, shape_dict)
@@ -134,21 +190,31 @@ def create_rotated_point_clouds(shape_dicts, n, sigma, k):
         points = point_cloud(shape, n, sigma, shape_dict)
 
         for i in range(k):
-            points = rotate_around_axis(points, "x", random.uniform(0, 2 * math.pi))
-            points = rotate_around_axis(points, "y", random.uniform(0, 2 * math.pi))
-            points = rotate_around_axis(points, "z", random.uniform(0, 2 * math.pi))
+            points_copy = copy.deepcopy(points)
+            points_copy = rotate_around_axis(points_copy, "x", random.uniform(0, 2 * math.pi))
+            points_copy = rotate_around_axis(points_copy, "y", random.uniform(0, 2 * math.pi))
+            points_copy = rotate_around_axis(points_copy, "z", random.uniform(0, 2 * math.pi))
+            points_copy = scale_points(points_copy, random.uniform(1, 10))
+            np.savetxt(f'rotated_scaled_point_clouds/{shape}_{i}.csv', points_copy, delimiter=',')
 
-            np.savetxt(f'rotated_point_clouds/{shape}_{i}.csv', points, delimiter=',')
+
+def plot_all_shapes(shape=None):
+    for filename in os.listdir("point_clouds"):
+        if shape is None or shape in filename:
+            f = os.path.join("point_clouds", filename)
+            points = np.loadtxt(f, delimiter=',')
+            plot_point_cloud(points, filename)
 
 
-def plot_shapes(shape, rotated=True, indices=None):
-    if rotated:
-        for idx in indices:
-            points = np.loadtxt(f'rotated_point_clouds/{shape}_{idx}.csv', delimiter=',')
-            plot_point_cloud(points)
-    else:
-        points = np.loadtxt(f'point_clouds/{shape}.csv', delimiter=',')
-        plot_point_cloud(points)
+def plot_rotated_shapes(shape=None, n=0):
+    for filename in os.listdir("rotated_scaled_point_clouds"):
+        matches = re.findall(f"_([0-9]*).csv", filename)
+        print(matches)
+
+        if (len(matches) == 1 and int(matches[0]) <= n) and (shape is None or shape in filename):
+            f = os.path.join("rotated_scaled_point_clouds", filename)
+            points = np.loadtxt(f, delimiter=',')
+            plot_point_cloud(points, filename)
 
 
 def main():
@@ -157,12 +223,15 @@ def main():
         "torus": {"r": 0.2, "R": 1},
         "cube": {"edge_len": 1},
         "line": {"direction": (1, 1, 0.2), "length": 1},
-        "cylinder": {"r": 1, "height": 2}
+        "cylinder": {"r": 1, "height": 1},
+        "cuboid": {"a": 1, "b": 2, "c": 0.5},
+        "ellipsoid": {"a": 1, "b": 2, "c": 0.5}
     }
     # create_point_clouds(shape_dicts, 500, 0.01)
-    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 10)
+    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 100)
 
-    plot_shapes("cylinder", True, list(range(10)))
+    # plot_all_shapes()
+    plot_rotated_shapes()
 
 
 if __name__ == "__main__":
