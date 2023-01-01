@@ -15,4 +15,11 @@
 ![image](https://user-images.githubusercontent.com/47631585/207685427-f588c3e1-18b5-41ff-9707-3d1bdf22386e.png)
 
 ### cylinder
-![image](https://user-images.githubusercontent.com/47631585/207691600-2a007a76-9ff2-4c75-8d80-add674d59129.png)
+![image](https://user-images.githubusercontent.com/47631585/210185808-cd0d0990-de24-467c-bb61-069821240999.png)
+
+### cuboid
+![image](https://user-images.githubusercontent.com/47631585/210185791-858c72a0-c6fb-4742-aa72-28b6d51542ad.png)
+
+
+### ellipsoid
+![image](https://user-images.githubusercontent.com/47631585/210185800-8be55890-2010-46a9-b2ac-9821f762d21d.png)
