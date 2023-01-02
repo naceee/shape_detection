@@ -17,7 +17,7 @@ def get_persistence_dataframe(f_name, num_points=100, max_dimensions=3):
 
     skeleton = gd.RipsComplex(
         distance_matrix=D.values,
-        max_edge_length=20
+        max_edge_length=100
     )
 
     rips_simplex_tree = skeleton.create_simplex_tree(max_dimension=max_dimensions)
@@ -65,16 +65,16 @@ def save_persistence_dataframes(num_points=200):
 
 def plot_persistence_diagrams(shape=None, n=0):
     for filename in os.listdir("persistence"):
-        matches = re.findall(f"_([0-9]*)_n=[0-9]*.csv", filename)
+        matches = re.findall(f"([a-z]*)_([0-9]*)_n=[0-9]*.csv", filename)
 
-        if (len(matches) == 1 and int(matches[0]) <= n) and (shape is None or shape in filename):
+        if (len(matches) == 1 and int(matches[0][1]) <= n) and (shape is None or shape in filename):
             persistence_df = pd.read_csv(os.path.join("persistence", filename))
-            plot_persistence_diagram(persistence_df, shape)
+            plot_persistence_diagram(persistence_df, matches[0][0])
 
 
 def main():
-    save_persistence_dataframes()
-    # plot_persistence_diagrams(shape="cube", n=20)
+    # save_persistence_dataframes()
+    plot_persistence_diagrams(n=1)
 
 
 if __name__ == "__main__":
