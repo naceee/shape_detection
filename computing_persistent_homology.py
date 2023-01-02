@@ -28,7 +28,7 @@ def get_persistence_dataframe(f_name, num_points=100, max_dimensions=3):
     return persistence
 
 
-def plot_persistence_diagram(persistence_df, shape=None):
+def plot_persistence_diagram(persistence_df, shape=None, save_filename=None):
     warnings.filterwarnings("ignore")
 
     m = persistence_df.loc[persistence_df['death'] != np.inf, 'death'].max()
@@ -41,6 +41,9 @@ def plot_persistence_diagram(persistence_df, shape=None):
     plt.xlim((-0.1 * m, m * 1.1))
     plt.ylim((-0.1 * m, m * 1.1))
     plt.legend(loc='lower right')
+    if save_filename is not None:
+        plt.savefig(f"persistence_diagrams/{save_filename}.pdf")
+
     plt.show()
 
 
@@ -63,18 +66,21 @@ def save_persistence_dataframes(num_points=200):
             print("persistent homology for", persistence_filename, "is already computed")
 
 
-def plot_persistence_diagrams(shape=None, n=0):
+def plot_persistence_diagrams(shape=None, n=0, save=False):
     for filename in os.listdir("persistence"):
         matches = re.findall(f"([a-z]*)_([0-9]*)_n=[0-9]*.csv", filename)
 
         if (len(matches) == 1 and int(matches[0][1]) <= n) and (shape is None or shape in filename):
             persistence_df = pd.read_csv(os.path.join("persistence", filename))
-            plot_persistence_diagram(persistence_df, matches[0][0])
+            if save:
+                plot_persistence_diagram(persistence_df, matches[0][0], save_filename=filename[:-4])
+            else:
+                plot_persistence_diagram(persistence_df, matches[0][0])
 
 
 def main():
     # save_persistence_dataframes()
-    plot_persistence_diagrams(n=1)
+    plot_persistence_diagrams(n=20, save=True)
 
 
 if __name__ == "__main__":
