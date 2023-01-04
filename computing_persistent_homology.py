@@ -79,8 +79,8 @@ def plot_persistence_diagrams(shape=None, n=0, save=False):
 
 
 def main():
-    # save_persistence_dataframes()
-    plot_persistence_diagrams(n=20, save=True)
+    save_persistence_dataframes()
+    # plot_persistence_diagrams(n=60, save=True)
 
 
 if __name__ == "__main__":
