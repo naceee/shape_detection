@@ -9,11 +9,12 @@ import warnings
 import os
 
 
-def plot_point_cloud(points, title=""):
+def plot_point_cloud(points, title="", figsize=(6, 6), num_points=500):
     # sorry this is very ugly
     warnings.filterwarnings("ignore")
+    points = points[:num_points]
 
-    fig = plt.figure(num=1, figsize=(6, 6))
+    fig = plt.figure(num=1, figsize=figsize)
     ax = fig.add_subplot(projection='3d')
 
     # For each set of style and range settings, plot num_points random points in the box
@@ -184,10 +185,10 @@ def scale_points(points, k):
     return points * k
 
 
-def create_rotated_point_clouds(shape_dicts, n, sigma, k):
+def create_rotated_point_clouds(shape_dicts, n, sigma, lower, upper):
     for shape, shape_dict in shape_dicts.items():
 
-        for i in range(k):
+        for i in range(lower, upper):
             points = point_cloud(shape, n, sigma, shape_dict)
             points = rotate_around_axis(points, "x", random.uniform(0, 2 * math.pi))
             points = rotate_around_axis(points, "y", random.uniform(0, 2 * math.pi))
@@ -207,16 +208,20 @@ def plot_shapes(shape=None, n=0):
 
 
 def main():
-    shape_dicts = {
-        "sphere": {"r": 1},
-        "torus": {"r": 0.2, "R": 1},
-        "cube": {"edge_len": 1},
-        "line": {"direction": (1, 1, 0.2), "length": 1},
-        "cylinder": {"r": 1, "height": 1},
-        "cuboid": {"a": 1, "b": 2, "c": 0.5},
-        "ellipsoid": {"a": 1, "b": 2, "c": 0.5}
-    }
-    # create_rotated_point_clouds(shape_dicts, 500, 0.01, 20)
+    for i in range(0, 40):
+        a = random.uniform(1, 1.5)
+        b = random.uniform(0.5, 1)
+        c = random.uniform(0.2, 0.5)
+        shape_dicts = {
+            "sphere": {"r": 1},
+            "torus": {"r": c, "R": a},
+            "cube": {"edge_len": 1},
+            "line": {"direction": (1, 1, 0.2), "length": 1},
+            "cylinder": {"r": c, "height": a},
+            "cuboid": {"a": a, "b": b, "c": c},
+            "ellipsoid": {"a": a, "b": b, "c": c}
+        }
+        create_rotated_point_clouds(shape_dicts, 500, 0.01, i, i+1)
 
     plot_shapes()
 
