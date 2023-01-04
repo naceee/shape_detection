@@ -1,8 +1,6 @@
-import copy
 import math
 import random
 import re
-
 import numpy as np
 import matplotlib.pyplot as plt
 import warnings

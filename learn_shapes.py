@@ -11,7 +11,7 @@ def train_model(resolution=4):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     # Create a Gaussian Classifier
-    clf = RandomForestClassifier(bootstrap=True, criterion='gini', max_depth=30, n_estimators=1000)
+    clf = RandomForestClassifier(bootstrap=True, criterion='gini', max_depth=10, n_estimators=1000)
 
     # Train the model using the training sets
     clf.fit(X_train, y_train)

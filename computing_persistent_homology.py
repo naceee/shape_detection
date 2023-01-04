@@ -11,7 +11,7 @@ import time
 
 
 def get_persistence_dataframe(f_name, num_points=100, max_dimensions=3):
-    df = pd.read_csv(f_name)
+    df = pd.read_csv(f_name, header=None)
     df = df.iloc[:num_points]
     D = pd.DataFrame(distance_matrix(df.values, df.values), index=df.index, columns=df.index)
 
