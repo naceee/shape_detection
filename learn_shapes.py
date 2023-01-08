@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -28,9 +29,15 @@ def train_model(resolution=4):
         if t != p:
             print(f"{t:9} | {p:9}")
 
+    return metrics.accuracy_score(y_test, y_pred)
+
 
 if __name__ == "__main__":
-    for r in range(2, 21):
+    y = []
+    for r in range(2, 8):
         print("resolution:", r)
-        train_model()
+        y.append(train_model(r))
         print()
+
+    plt.plot(list(range(2, 8)), y)
+    plt.show()
