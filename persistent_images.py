@@ -61,7 +61,8 @@ def create_persistence_image(filename, plot=False, resolution=5):
 
 def create_training_set(n=40, resolution=5):
     training_set = []
-    for shape in ["cube", "cuboid", "cylinder", "ellipsoid", "line", "sphere", "torus"]:
+    for shape in ["cube", "cuboid", "cylinder", "ellipsoid", "line", "sphere", "torus", "banana",
+                  "tetrahedron", "filled_cube", "filled_sphere"]:
         for i in range(n):
             x = create_persistence_image(f"persistence/{shape}_{i}_n=200.csv",
                                          plot=False, resolution=resolution)
@@ -72,8 +73,10 @@ def create_training_set(n=40, resolution=5):
 
 def main():
     for r in range(2, 21):
+        print(r)
         create_training_set(n=100, resolution=r)
 
 
 if __name__ == "__main__":
     main()
+    # create_persistence_image("persistence/line_0_n=200.csv", plot=True, resolution=5)
