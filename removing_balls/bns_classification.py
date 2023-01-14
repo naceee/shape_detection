@@ -23,6 +23,8 @@ if __name__ == '__main__':
     max_bns_len = 0
 
     for fname in os.listdir(data_path):
+        if not fname.startswith('4D'):
+            continue
         bns, tgt = load_bns_from_file(fname)
         max_bn_dim = max(map(len, bns))
         bns = list(map(lambda x: x if len(x) == max_bn_dim else x + [0]*(max_bn_dim-len(x)), bns))
@@ -39,7 +41,7 @@ if __name__ == '__main__':
             pbns = p*(len(bns)-1)
             il, ih = int(pbns), int(pbns)+1
             w = pbns - int(pbns)
-            entry = [bns[il][d]*(1-w)+bns[ih][d]*w for d in range(3)]
+            entry = [bns[il][d]*(1-w)+bns[ih][d]*w for d in range(4)]
             nbns.append(entry)
         ndata.append(nbns)
     data = ndata
@@ -50,6 +52,8 @@ if __name__ == '__main__':
 
     data = list(map(lambda bns: np.concatenate(np.array(bns, dtype=float).T), data))
     data = np.array(data)
+    print('the data:')
+    print(data[:4])
 
     X_train, X_test, y_train, y_test = train_test_split(data, targets, test_size=0.3)
 

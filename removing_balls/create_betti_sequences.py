@@ -56,13 +56,13 @@ def progressive_betti_numbers(V, r):
     return bns
 
 
-def progressive_betti_numbers2(V, r, steps=50, pcfname='pointcloud.txt'):
+def progressive_betti_numbers2(V, r, steps=50, pcfname='0_pointcloud.txt'):
     mid_point = list(map(lambda xs: sum(xs) / len(xs), zip(*V)))
     max_dist = max(map(lambda x: np.linalg.norm(np.array(mid_point)-np.array(x)), V))
     #steps = 50
     bns = []
     RC = gd.RipsComplex(points=V, max_edge_length=r)
-    ST = RC.create_simplex_tree(max_dimension=3)
+    ST = RC.create_simplex_tree(max_dimension=len(mid_point))
     ST.reset_filtration(0.0)
     open('../betty_number_sequences/'+pcfname, 'w').close()
     for step in range(steps):
@@ -81,6 +81,7 @@ def progressive_betti_numbers2(V, r, steps=50, pcfname='pointcloud.txt'):
         ST.compute_persistence()
         #print('calculated persistence')
         betti_nums = ST.betti_numbers()
+        #print(betti_nums)
         with open('../betty_number_sequences/'+pcfname, 'a') as f:
             f.write(','.join(map(str,betti_nums)) + '\n')
         #print('calculated betti numbers')
@@ -110,9 +111,10 @@ def create_betty_seq_data(num_points=200, r_maxmin_distance_multiplier=2.5):
 
 
 if __name__ == '__main__':
-    pass
-    #path = './point_clouds/cube_0.csv'
-    #V = V_from_file(path, 200)
-    #h = r_from_max_min_distance(V)
-    #progressive_betti_numbers2(V,2.5*h)
+    #pass
+    path = '../point_clouds/4D_cube_0.csv'
+    V = V_from_file(path, 200)
+    #r_Rips_graph(V)
+    h = r_from_max_min_distance(V)
+    progressive_betti_numbers2(V,2*h)
     #create_betty_seq_data()
