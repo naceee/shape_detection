@@ -10,7 +10,12 @@ import random
 def V_from_file(path, n):
     with open(path, 'r') as f:
         data = f.readlines()
-    return list(map(lambda line: list(map(float, line.split(','))), data))[:n]
+    points = list(map(lambda line: list(map(float, line.split(','))), data))
+    if n != 0:
+        return points[:n]
+    else:
+        return points
+
 
 
 def r_from_max_min_distance(V, avg=5):

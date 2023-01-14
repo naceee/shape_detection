@@ -12,7 +12,7 @@ def load_bns_from_file(fname):
         bns = f.readlines()
     bns = list(map(str.strip, bns))
     bns = list(map(lambda x: list(map(int, x.split(','))), bns))
-    return bns, fname.split('_')[0]
+    return bns, '4D_'+fname[3:].split('_')[0]
 
 if __name__ == '__main__':
     data = []
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     max_bns_len = 0
 
     for fname in os.listdir(data_path):
-        if not fname.startswith('4D'):
+        if not (fname.startswith('4D') and 'n=200' in fname):
             continue
         bns, tgt = load_bns_from_file(fname)
         max_bn_dim = max(map(len, bns))
@@ -53,7 +53,8 @@ if __name__ == '__main__':
     data = list(map(lambda bns: np.concatenate(np.array(bns, dtype=float).T), data))
     data = np.array(data)
     print('the data:')
-    print(data[:4])
+    print(data[:5])
+    print(targets[:5])
 
     X_train, X_test, y_train, y_test = train_test_split(data, targets, test_size=0.3)
 
