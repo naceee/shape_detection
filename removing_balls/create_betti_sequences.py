@@ -39,6 +39,10 @@ def r_Rips_graph(V, steps=30):
         rs.append(r)
         num_of_verts.append(sxtree.num_simplices())
     plt.plot(rs, num_of_verts)
+    plt.title('Cube 0')
+    plt.xlabel('radius')
+    plt.ylabel('# of simplices')
+    plt.savefig('r_choice.png')
     plt.show()
 
 
@@ -117,9 +121,9 @@ def create_betty_seq_data(num_points=200, r_maxmin_distance_multiplier=2.5):
 
 if __name__ == '__main__':
     #pass
-    path = '../point_clouds/4D_cube_0.csv'
+    path = '../point_clouds/cube_0.csv'
     V = V_from_file(path, 200)
-    #r_Rips_graph(V)
-    h = r_from_max_min_distance(V)
-    progressive_betti_numbers2(V,2*h)
+    r_Rips_graph(V)
+    #h = r_from_max_min_distance(V)
+    #progressive_betti_numbers2(V,2*h)
     #create_betty_seq_data()
